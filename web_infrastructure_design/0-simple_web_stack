@@ -1,0 +1,54 @@
+Diagram: https://imgur.com/a/hVBFHCB
+
+# Task 0 - Simple web stack
+
+A user wants to open www.foobar.com in their browser:
+
+1. The browser asks DNS for the IP address of www.foobar.com.
+2. DNS answers with 8.8.8.8, the IP of our single server.
+3. The browser sends an HTTPS request to 8.8.8.8 (TCP port 443).
+4. Nginx receives the request. It serves static files itself and forwards
+   dynamic requests to the application server.
+5. The application server runs the code base, queries the MySQL database if it
+   needs data, and builds the page.
+6. The page goes back through Nginx to the user's browser.
+
+## Infrastructure
+
+- 1 server (IP 8.8.8.8) hosting everything below
+- 1 web server: Nginx
+- 1 application server
+- 1 application files (code base)
+- 1 database: MySQL
+- 1 domain name: foobar.com, with a www record pointing to 8.8.8.8
+
+## Specifics
+
+- What is a server: a computer (physical or virtual) that is always on and
+  provides a service (here, hosting a website) to other computers, called
+  clients, over a network.
+- Role of the domain name: it is a human-friendly name for an IP address.
+  People remember foobar.com, not 8.8.8.8. DNS translates the name into the IP.
+- Type of DNS record of www in www.foobar.com: an A record. It maps the name
+  www.foobar.com to an IPv4 address (8.8.8.8).
+- Role of the web server (Nginx): it accepts the HTTP/HTTPS requests from
+  users, serves static content (images, CSS, JS) and passes dynamic requests
+  to the application server, then sends the response back to the user.
+- Role of the application server: it executes the application code (business
+  logic), generates dynamic content and talks to the database.
+- Role of the database (MySQL): it stores and retrieves the website's data
+  (users, articles, orders...) in a structured and persistent way.
+- Communication with the user's computer: the server uses the HTTP protocol
+  (HTTPS when encrypted) over TCP/IP.
+
+## Issues with this infrastructure
+
+- SPOF (single point of failure): there is only one server. If it crashes
+  (hardware, network, a component like Nginx or MySQL), the whole website is
+  down.
+- Downtime during maintenance: deploying new code or updating a component
+  often requires restarting the web server or application server, and the
+  website is unavailable during the restart.
+- Cannot scale: a single server has limited CPU, RAM and bandwidth. If there is
+  too much incoming traffic, it becomes slow or crashes, and there is no other
+  server to share the load.
