@@ -1,0 +1,30 @@
+Diagram: https://imgur.com/a/rQacO94
+
+# Task 1 - Distributed web infrastructure
+
+A user wants to open www.foobar.com in their browser:
+
+1. The browser asks DNS for the IP address of www.foobar.com.
+2. DNS answers with 8.8.8.8, the IP of the load balancer.
+3. The browser sends an HTTP request to 8.8.8.8.
+4. HAProxy chooses one of the two servers (round robin) and forwards the
+   request to its Nginx web server.
+5. Nginx serves static files itself and forwards dynamic requests to the
+   application server. The application server runs the code base and talks to
+   MySQL: writes go to the Primary, reads can go to the Replica.
+6. The response goes back through the load balancer to the user.
+
+## Infrastructure
+
+- 3 servers in total: Server 1, Server 2 and Server 3 (the load balancer)
+- Server 3: 1 load balancer (HAProxy), IP 8.8.8.8
+- Server 1: 1 web server (Nginx), 1 application server, 1 set of application
+  files (code base), 1 MySQL database (Primary)
+- Server 2: 1 web server (Nginx), 1 application server, 1 set of application
+  files (code base), 1 MySQL database (Replica)
+- 1 domain name: foobar.com, with a www A record pointing to 8.8.8.8
+
+## Why each additional element is added
+
+- Second server (with its own web server, application server and code base): it
+  gives redundancy, because if one server
